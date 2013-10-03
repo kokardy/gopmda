@@ -76,6 +76,15 @@ func (url DrugURL) Titles() (titles []string) {
 	for _, pre_title := range strings.Split(title, "／") {
 		titles = append(titles, titlize(pre_title))
 	}
+	drugs_log, err := os.OpenFile(DRUG_LOG, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+	if err != nil {
+		log.Panicf("drug path file open error:", err)
+	}
+	defer drugs_log.Close()
+
+	for _, title := range titles {
+		drugs_log.WriteString(title + "\t" + string(url.DrugPath()) + "\n")
+	}
 	return
 }
 

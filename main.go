@@ -104,10 +104,19 @@ func LoadSaveData(path string) []DrugURL {
 
 func DownloadAll() {
 	log.Println("download start")
-	_history, _ := LoadDrugURLHistory(HISTORY_PATH)
+	var (
+		_history DrugURLHistory
+		err      error
+	)
+	if _history, err = LoadDrugURLHistory(HISTORY_PATH); err != nil {
+		_history = NewDrugURLHistory()
+	}
 	durls := LoadSaveData(SAVED_LIST_PATH)
 	for _, durl := range durls {
 		_history[durl] = true
+	}
+	if err = _history.Save(HISTORY_PATH); err != nil {
+		log.Println("err:", err)
 	}
 
 	save, err := os.OpenFile(SAVED_LIST_PATH, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
@@ -116,12 +125,6 @@ func DownloadAll() {
 
 	}
 	defer save.Close()
-
-	drugs_log, err := os.OpenFile(DRUG_LOG, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
-	if err != nil {
-		log.Panicf("drug path file open error:", err)
-	}
-	defer drugs_log.Close()
 
 	for durl, finished := range _history {
 		log.Println(durl, finished)
@@ -135,16 +138,13 @@ func DownloadAll() {
 					log.Printf(`%s:"%v"`, key, string(link))
 				}
 				if err := durl.Download(); err == ERR_ALREADY_EXISTS {
-					for _, title := range titles {
-						drugs_log.WriteString(title + "\t" + string(durl.DrugPath()) + "\n")
-					}
+					//do nothing
+				} else if err != nil {
+					log.Panicln("download err:", err)
 				} else {
 					_, err := save.WriteString(string(durl) + "\n")
 					if err != nil {
 						panic(err)
-					}
-					for _, title := range titles {
-						drugs_log.WriteString(title + "\t" + string(durl.DrugPath()) + "\n")
 					}
 					time.Sleep(1 * time.Second)
 				}

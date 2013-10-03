@@ -19,6 +19,7 @@ var (
 	URL_UPDATE_FROM_1_MONTH_AGO = URL(`http://www.info.pmda.go.jp/downfiles/ph/tenpulist.html`)
 	REGEXP_UPDATE_DRUG_URL      = regexp.MustCompile(`/go/pack/\d{7}[A-Z]\d{4}_\d_\d{2}/`)
 	REGEXP_DELETE_DRUG_COMMENT  = regexp.MustCompile(`\d{7}[A-Z]\d{4}_\d_\d{2}`)
+	PATH_UPDATE_DATE            = "update.xml"
 )
 
 type DeleteList []string
@@ -40,6 +41,20 @@ func (ul UpdateList) Update() {
 			time.Sleep(1 * time.Second)
 		}
 	}
+	now := time.Now()
+	if b, err := xml.Marshal(now); err != nil {
+		log.Panicln("'Now' cannot be marshaled")
+	} else {
+		if w, err := os.OpenFile(PATH_UPDATE_DATE, os.O_CREATE|os.O_RDWR, 0666); err != nil {
+			log.Panicln("cannot open ", PATH_UPDATE_DATE)
+		} else {
+			_, err = w.Write(b)
+			if err != nil {
+				log.Panicln("cannot write to ", PATH_UPDATE_DATE)
+			}
+		}
+	}
+
 }
 
 func DeleteAndUpdate(i int) (deleteList DeleteList, updateList UpdateList, err error) {

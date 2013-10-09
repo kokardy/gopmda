@@ -22,6 +22,17 @@ var (
 	ERR_ALREADY_EXISTS              = errors.New("already exists")
 )
 
+func Exists(path string) bool {
+	if _, err := os.Stat(path); err == nil {
+		return true
+	} else if os.IsNotExist(err) {
+		return false
+	} else {
+		log.Panicln("unexpected err:", err)
+	}
+  return false
+}
+
 func scan_link(line string) (filetype string, url URL, err error) {
 	exps := []*regexp.Regexp{
 		REGEXP_PHARMACEUTICAL_REFERENCE,
@@ -111,11 +122,28 @@ func (url DrugURL) Links() (links map[string]URL) {
 	return
 }
 
+func (durl DrugURL) IsFinished() bool {
+	drug_path := durl.DrugPath()
+	pr_path := filepath.Join(drug_path, "PR.pdf")
+	sgml_path := filepath.Join(drug_path, "SGML.zip")
+	path_list := []string{
+		drug_path,
+		pr_path,
+		sgml_path,
+	}
+	for _, path := range path_list {
+		if !Exists(path) {
+			return false
+		}
+	}
+	return true
+}
+
 func (durl DrugURL) Download() (err error) {
 	log.Println("download:", durl)
 	urls := durl.Links()
 	drug_path := durl.DrugPath()
-	if _, err := os.Stat(drug_path); err == nil {
+	if durl.IsFinished() {
 		log.Println("already exists", durl)
 		return ERR_ALREADY_EXISTS
 	}

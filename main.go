@@ -127,8 +127,8 @@ func DownloadAll() {
 	defer save.Close()
 
 	for durl, finished := range _history {
-		log.Println(durl, finished)
-		if !finished {
+		log.Printf("%s is finished : %v\n", string(durl), finished)
+		if !finished && !durl.IsFinished() {
 			titles := durl.Titles()
 			log.Printf("title: %v", titles)
 			links := durl.Links()

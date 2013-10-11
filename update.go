@@ -26,6 +26,7 @@ type DeleteList []string
 
 func (dl DeleteList) Delete() {
 	for _, dirname := range dl {
+		dirname = strings.Trim(dirname, " ")
 		path := filepath.Join(SAVE_PATH, dirname)
 		new_path := filepath.Join(SAVE_PATH, "deleted", dirname)
 		err := os.Rename(path, new_path)

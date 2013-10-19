@@ -30,7 +30,11 @@ func (dl DeleteList) Delete() {
 		path := filepath.Join(SAVE_PATH, dirname)
 		new_path := filepath.Join(SAVE_PATH, "deleted", dirname)
 		err := os.Rename(path, new_path)
-		log.Println("rename err:", err)
+		if err != nil {
+			log.Println("rename err:", err)
+		} else {
+			log.Prinln("delete:", dirname)
+		}
 	}
 }
 
@@ -39,7 +43,7 @@ type UpdateList []DrugURL
 func (ul UpdateList) Update() {
 	for _, drug_url := range ul {
 		if err := drug_url.Download(); err != ERR_ALREADY_EXISTS {
-			time.Sleep(1 * time.Second)
+			time.Sleep(2 * time.Second)
 		}
 	}
 	now := time.Now()

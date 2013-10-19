@@ -146,7 +146,7 @@ func DownloadAll() {
 					if err != nil {
 						panic(err)
 					}
-					time.Sleep(1 * time.Second)
+					time.Sleep(2 * time.Second)
 				}
 			}
 		}

@@ -33,7 +33,7 @@ func (dl DeleteList) Delete() {
 		if err != nil {
 			log.Println("rename err:", err)
 		} else {
-			log.Prinln("delete:", dirname)
+			log.Println("delete:", dirname)
 		}
 	}
 }

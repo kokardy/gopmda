@@ -141,12 +141,12 @@ func (durl DrugURL) IsFinished() bool {
 
 func (durl DrugURL) Download() (err error) {
 	log.Println("download:", durl)
-	urls := durl.Links()
 	drug_path := durl.DrugPath()
 	if durl.IsFinished() {
 		log.Println("already exists", durl)
 		return ERR_ALREADY_EXISTS
 	}
+	urls := durl.Links()
 	for filetype, url := range urls {
 		var path string
 		switch filetype {

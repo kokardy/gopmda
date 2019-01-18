@@ -1,9 +1,9 @@
 package gopmda
 
 import (
-	"bufio"
+	//"bufio"
 	"log"
-	"os"
+	//"os"
 	"testing"
 )
 

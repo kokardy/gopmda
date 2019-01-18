@@ -3,7 +3,8 @@ package gopmda
 import (
 	"bufio"
 	"bytes"
-	"code.google.com/p/mahonia"
+	//"code.google.com/p/mahonia"
+	"github.com/axgle/mahonia"
 	"fmt"
 	"io"
 	"log"
@@ -121,7 +122,7 @@ func DownloadAll() {
 
 	save, err := os.OpenFile(SAVED_LIST_PATH, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
 	if err != nil {
-		log.Panicf("save file open error:", err)
+		log.Panicf("save file open error:%s\n", err)
 
 	}
 	defer save.Close()

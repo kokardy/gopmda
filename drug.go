@@ -30,7 +30,7 @@ func Exists(path string) bool {
 	} else {
 		log.Panicln("unexpected err:", err)
 	}
-  return false
+	return false
 }
 
 func scan_link(line string) (filetype string, url URL, err error) {
@@ -68,6 +68,18 @@ func (url DrugURL) foot() *bufio.Reader {
 	q := map[string]string{"view": "foot"}
 	return URL(url).Query(q)
 }
+func (url DrugURL) footURL() URL {
+	u := URL(url + "?view=foot")
+	return u
+}
+func (url DrugURL) tocURL() URL {
+	u := URL(url + "?view=toc")
+	return u
+}
+func (url DrugURL) bodyURL() URL {
+	u := URL(url + "?view=body")
+	return u
+}
 
 func (url DrugURL) Title() (title string) {
 	reader := URL(url).Get()
@@ -89,7 +101,7 @@ func (url DrugURL) Titles() (titles []string) {
 	}
 	drugs_log, err := os.OpenFile(DRUG_LOG, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
 	if err != nil {
-		log.Panicf("drug path file open error:", err)
+		log.Panicf("drug path file open error: %s", err)
 	}
 	defer drugs_log.Close()
 
@@ -103,6 +115,11 @@ func (url DrugURL) Links() (links map[string]URL) {
 	links = make(map[string]URL)
 	r := url.foot()
 	var current_line string
+	links["toc"] = url.tocURL()
+	links["body"] = url.bodyURL()
+	//links["foot"] = url.footURL()
+	//footはSGMLとPDFのリンク先が一致しないのでいらない
+	//というか自前で作らないとダメ
 	for {
 		line, isPrefix, err := r.ReadLine()
 		if err != nil {
@@ -156,6 +173,12 @@ func (durl DrugURL) Download() (err error) {
 			path = filepath.Join(drug_path, "IF.pdf")
 		case "SGML":
 			path = filepath.Join(drug_path, "SGML.zip")
+		case "foot":
+			path = filepath.Join(drug_path, "foot.html")
+		case "toc":
+			path = filepath.Join(drug_path, "toc.html")
+		case "body":
+			path = filepath.Join(drug_path, "body.html")
 		default:
 			log.Panicf("unknown filetype '%s'", filetype)
 
@@ -238,6 +261,6 @@ func (his DrugURLHistory) Save(fpath string) (err error) {
 		return
 	}
 	err = ioutil.WriteFile(fpath, b, 0666)
-	log.Println("save history:%s", fpath)
+	log.Printf("save history:%s\n", fpath)
 	return
 }

@@ -3,14 +3,16 @@ package gopmda
 import (
 	"bufio"
 	"bytes"
+
 	//"code.google.com/p/mahonia"
-	"github.com/axgle/mahonia"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/axgle/mahonia"
 )
 
 const (

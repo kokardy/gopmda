@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -34,24 +35,32 @@ func server() {
 	//フレーム付きHTML
 	r.GET("/yj/:yjcode/", handleYJ)
 
+	//フレーム付きHTML
+	r.GET("/path/:path/", handlePath)
+
 	//メニューフレーム
-	r.GET("/yj/:yjcode/?view=toc", handleYJ)
+	r.GET("/path/:path/?view=toc", handlePath)
 
 	//メインフレーム
-	r.GET("/yj/:yjcode/?view=body", handleYJ)
+	r.GET("/path/:path/?view=body", handlePath)
 
-	//添付文書PDF
-	r.GET("/yj/:yjcode/PR", handleYJ)
-
-	//インタビューフォームPDF
-	r.GET("/yj/:yjcode/IF", handleYJ)
+	//静的ファイル 添付文書PDF,インタビューフォームPDF
+	r.Static("/path", "save/")
 
 	r.Run(":8080")
 
 }
 
+func handlePath(c *gin.Context) {
+	path := c.Param("path")
+	path = fmt.Sprintf("save/%s/", path)
+	c.DinamicFile(fdsa)
+
+}
+
 func handleYJ(c *gin.Context) {
 	yj := c.Param("yjcode")
+
 	dirs := getDirs(yj)
 	//TODO YJからフォルダ決定
 
@@ -63,7 +72,9 @@ func handleYJ(c *gin.Context) {
 
 	//一つに決まるとき
 	if len(dirs) == 1 {
-
+		//redirect
+		newPath := fmt.Sprintf("/path/%s/", dirs[0])
+		c.Redirect(303, newPath)
 		return
 	}
 

@@ -39,10 +39,10 @@ func server() {
 	r.GET("/path/:path/", handlePath)
 
 	//メニューフレーム
-	r.GET("/path/:path/?view=toc", handlePath)
+	r.GET("/path/:path/?view=toc", handleToc)
 
 	//メインフレーム
-	r.GET("/path/:path/?view=body", handlePath)
+	r.GET("/path/:path/?view=body", handleBody)
 
 	//静的ファイル 添付文書PDF,インタビューフォームPDF
 	r.Static("/path", "save/")
@@ -54,8 +54,17 @@ func server() {
 func handlePath(c *gin.Context) {
 	path := c.Param("path")
 	path = fmt.Sprintf("save/%s/", path)
-	c.DinamicFile(fdsa)
+}
+func handleToc(c *gin.Context) {
+	path := c.Param("path")
+	newPath := fmt.Sprintf("/path/%s/toc.html", path)
+	c.Redirect(303, newPath)
+}
 
+func handleBody(c *gin.Context) {
+	path := c.Param("path")
+	newPath := fmt.Sprintf("/path/%s/body.html", path)
+	c.Redirect(303, newPath)
 }
 
 func handleYJ(c *gin.Context) {

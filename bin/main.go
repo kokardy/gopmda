@@ -3,12 +3,18 @@ package main
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kokardy/gopmda"
 )
 
 func main() {
+	go download()
+	server()
+}
+
+func download() {
 	//全部ダウンロード
 	gopmda.DownloadAll()
 	deleteList, UpdateList, err := gopmda.DeleteAndUpdate(1)
@@ -35,8 +41,11 @@ func server() {
 	//フレーム付きHTML
 	r.GET("/yj/:yjcode/", handleYJ)
 
+	//静的ファイル 添付文書PDF,インタビューフォームPDF
+	r.GET("/path/:path/:file", handleFile)
+
 	//フレーム付きHTML
-	r.GET("/path/:path/", handlePath)
+	r.GET("/path/:path/main", handlePath)
 
 	//メニューフレーム
 	r.GET("/path/:path/?view=toc", handleToc)
@@ -44,16 +53,23 @@ func server() {
 	//メインフレーム
 	r.GET("/path/:path/?view=body", handleBody)
 
-	//静的ファイル 添付文書PDF,インタビューフォームPDF
-	r.Static("/path", "save/")
-
 	r.Run(":8080")
 
+}
+
+func handleFile(c *gin.Context) {
+	path := c.Param("path")
+	filename := c.Param("file")
+	path = filepath.Join(path, filename)
+	c.File(path)
 }
 
 func handlePath(c *gin.Context) {
 	path := c.Param("path")
 	path = fmt.Sprintf("save/%s/", path)
+	c.HTML(200, "frame.html", gin.H{
+		"path": path,
+	})
 }
 func handleToc(c *gin.Context) {
 	path := c.Param("path")
@@ -70,8 +86,11 @@ func handleBody(c *gin.Context) {
 func handleYJ(c *gin.Context) {
 	yj := c.Param("yjcode")
 
-	dirs := getDirs(yj)
-	//TODO YJからフォルダ決定
+	//YJから始まるディレクトリを探す
+	dirs, err := getDirs(yj)
+	if err != nil {
+		c.String(404, "SERVER ERROR")
+	}
 
 	//ないとき
 	if len(dirs) == 0 {
@@ -88,11 +107,16 @@ func handleYJ(c *gin.Context) {
 	}
 
 	//決まらないとき
+	c.HTML(200, "choice.html", gin.H{
+		"pathlist": dirs,
+	})
 
 	return
 }
 
-func getDirs(yj string) []string {
-	result := make([]string, 0, 2)
-	return result
+//YJから該当するディレクトリのスライスを生成
+func getDirs(yj string) ([]string, error) {
+	pattern := fmt.Sprintf("save/%s*", yj)
+	result, err := filepath.Glob(pattern)
+	return result, err
 }

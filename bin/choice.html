@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+
+<html>
+
+<head>
+<title>候補選択</title>
+</head>
+
+<body>
+
+    <h2>候補が複数あります</h2>
+    <ul>
+    {{range pathlist}}
+        <li><a href="../path/{{.}}"/>{{.}}</a></li>
+    {{end}}
+    </ul>
+
+</body>
+
+
+</html>

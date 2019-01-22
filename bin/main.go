@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -10,8 +11,13 @@ import (
 )
 
 func main() {
-	go download()
-	server()
+	var serverMode bool
+	flag.BoolVar(&serverMode, "s", false, "-s true: run HTTP Server")
+	if serverMode {
+		server()
+	} else {
+		download()
+	}
 }
 
 func download() {
@@ -45,7 +51,7 @@ func server() {
 	r.GET("/path/:path/:file", handleFile)
 
 	//フレーム付きHTML
-	r.GET("/path/:path/main", handlePath)
+	r.GET("/path/:path/", handlePath)
 
 	//メニューフレーム
 	r.GET("/path/:path/?view=toc", handleToc)

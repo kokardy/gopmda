@@ -13,3 +13,6 @@ http://www.info.pmda.go.jp/go/pack/2123016F1131_1_04
 http://www.info.pmda.go.jp/go/pack/2359005S1224_1_03
 http://www.info.pmda.go.jp/go/pack/2659710Q1094_1_03
 http://www.info.pmda.go.jp/go/pack/3999408A1309_1_02
+http://www.info.pmda.go.jp/go/pack/1319757Q1043_2_01
+http://www.info.pmda.go.jp/go/pack/2149026F1131_1_05
+http://www.info.pmda.go.jp/go/pack/2344004X1224_2_06
